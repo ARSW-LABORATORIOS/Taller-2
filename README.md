@@ -73,7 +73,7 @@ Suponga que inicialmente existe 1 cupo y llegan al mismo tiempo dos solicitudes:
 
 ¿Cuál es el estado mutable compartido?
 
-> _(respuesta)_
+> El estado mutable compartido es la variable `availableSeats` de la clase `SeatInventory`, por lo que es un campo de instancia de tipo `int`, que podría ser leído y modificado simultáneamente por múltiples hilos (threads) sin ningún sistema de sincronización.
 
 ### 1.2 Operación compuesta
 
