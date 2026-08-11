@@ -1,4 +1,11 @@
 # Taller - Semana 2
+
+| Integrante | Código / ID | GitHub |
+|---|---|---|
+| | | |
+| | | |
+| | | |
+
 ## Condiciones de carrera, regiones críticas y decisiones arquitectónicas
 
 **Asignatura:** Arquitecturas de Software - ARSW
