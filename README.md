@@ -2,9 +2,9 @@
 
 | Integrante | Código / ID | GitHub |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Juan Eduardo Vera Acero | 1000091871 | juanvera |
+| Mabel Fernanda Bernal Amaya | 1000100629 | MabelBernalAmaya |
+| Nicolás David Prieto Ramos | 1000091873 | NicolasPrieto12 |
 
 ## Condiciones de carrera, regiones críticas y decisiones arquitectónicas
 
