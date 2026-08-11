@@ -13,9 +13,9 @@
 
 | Integrante | Código / ID | GitHub |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Juan Eduardo Vera Acero |  | |
+| Mabel Fernanda Bernal Amaya | | |
+| Nicolás David Prieto Ramos | | |
 
 **Repositorio:**  
 `PEGAR_AQUÍ_URL_DEL_REPOSITORIO`
