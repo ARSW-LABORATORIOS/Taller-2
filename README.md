@@ -1,560 +1,302 @@
-# ARSW — Laboratorio #2
-## Plantilla de entrega — Autonomous Warehouse
+# Taller - Semana 2
+## Condiciones de carrera, regiones críticas y decisiones arquitectónicas
 
-**Asignatura:** Arquitecturas de Software — ARSW  
-**Periodo:** 2026-2  
-**Laboratorio:** #2 — Autonomous Warehouse  
-**Tema:** Race Conditions · Critical Sections · Thread Coordination  
-**Tecnología:** Java 21 · Maven · JUnit 5  
+**Asignatura:** Arquitecturas de Software - ARSW
+**Periodo:** 2026-2
+**Duración máxima:** 60 minutos
+**Modalidad sugerida:** Parejas
+**Entrega:** Un único README.md por pareja
+**Código:** No se requiere modificar código durante este taller
 
----
-
-## 0. Información del equipo
-
-| Integrante | Código / ID | GitHub |
-|---|---|---|
-| Juan Eduardo Vera Acero |  | |
-| Mabel Fernanda Bernal Amaya | | |
-| Nicolás David Prieto Ramos | | |
-
-**Repositorio:**  
-`PEGAR_AQUÍ_URL_DEL_REPOSITORIO`
-
-**Commit final:**  
-`PEGAR_AQUÍ_HASH_DEL_COMMIT`
+> **Idea guía:** El objetivo no es "poner un `synchronized`". El objetivo es decidir qué consistencia debe garantizarse, dónde debe garantizarse y qué costo arquitectónico introduce esa decisión.
 
 ---
 
-# 1. Evidencia de ejecución inicial
+## 1. Propósito
 
-## 1.1 Verificación del entorno
+Al finalizar el taller, usted debe estar en capacidad de:
 
-Incluya la salida de:
+- Identificar estado mutable compartido.
+- Explicar una condición de carrera mediante un interleaving concreto.
+- Formular la invariante que debe conservar el sistema.
+- Delimitar la región crítica mínima.
+- Comparar mecanismos de sincronización según atributos de calidad.
+- Reconocer cuándo una solución válida dentro de una JVM deja de ser suficiente al escalar la arquitectura.
 
-```bash
-java -version
-mvn -version
+### Caso: reserva concurrente de cupos
+
+Un servicio administra los cupos disponibles para una actividad universitaria.
+
+```java
+public final class SeatInventory {
+    private int availableSeats;
+
+    public SeatInventory(int initialSeats) {
+        this.availableSeats = initialSeats;
+    }
+
+    public boolean reserve(int requestedSeats) {
+        if (availableSeats >= requestedSeats) {
+            availableSeats = availableSeats - requestedSeats;
+            return true;
+        }
+        return false;
+    }
+
+    public int availableSeats() {
+        return availableSeats;
+    }
+}
 ```
 
-**Evidencia:**
+Suponga que inicialmente existe 1 cupo y llegan al mismo tiempo dos solicitudes:
 
-```text
-PEGAR_AQUÍ_LA_SALIDA
-```
+- **Thread A:** `reserve(1)`
+- **Thread B:** `reserve(1)`
 
----
-
-## 1.2 Ejecución inicial
-
-Comando utilizado:
-
-```bash
-java -cp target/classes edu.eci.arsw.warehouse.app.WarehouseMain
-```
-
-o la configuración utilizada:
-
-```bash
-java -cp target/classes edu.eci.arsw.warehouse.app.WarehouseMain <robots> <packages>
-```
-
-**Configuración utilizada:**
-
-- Robots:
-- Paquetes:
-
-**Resultado observado:**
-
-```text
-PEGAR_AQUÍ_LA_SALIDA_RELEVANTE
-```
+> **Requisito de negocio:** Un mismo cupo no puede reservarse dos veces y el inventario nunca puede quedar en un estado inconsistente.
 
 ---
 
-# 2. Estado mutable compartido
+## Parte 1 - Diagnóstico de la carrera
 
-Identifique los objetos y variables compartidas entre múltiples threads.
+*Tiempo recomendado: 10 minutos*
 
-| Objeto / Clase | Estado mutable compartido | Quién lee | Quién modifica | Riesgo identificado |
-|---|---|---|---|---|
-| `PackageQueue` | | | | |
-| `DeliveryRegistry` | | | | |
-| `WarehouseStatistics` | | | | |
-| `SimulationControl` | | | | |
-| Otro | | | | |
+### 1.1 Estado compartido
 
----
+¿Cuál es el estado mutable compartido?
 
-# 3. Condiciones de carrera encontradas
+> _(respuesta)_
 
-Documente **mínimo tres** comportamientos incorrectos o potencialmente incorrectos.
+### 1.2 Operación compuesta
 
-## Race Condition #1
+La expresión de reserva parece una sola operación de negocio, pero realmente contiene varias acciones. Descompóngala en pasos lógicos.
 
-**Clase / método involucrado:**  
-`________________________________________`
+1. _(paso 1)_
+2. _(paso 2)_
+3. _(paso 3)_
 
-**Estado compartido involucrado:**  
-`________________________________________`
+### 1.3 Invariante
 
-**Comportamiento observado:**  
-`________________________________________`
+Defina la invariante principal que debe mantenerse.
 
-**¿Por qué ocurre?**  
-`________________________________________`
+> _(respuesta)_
 
-**Evidencia de ejecución:**
-
-```text
-PEGAR_AQUÍ_LA_EVIDENCIA
-```
-
----
-
-## Race Condition #2
-
-**Clase / método involucrado:**  
-`________________________________________`
-
-**Estado compartido involucrado:**  
-`________________________________________`
-
-**Comportamiento observado:**  
-`________________________________________`
-
-**¿Por qué ocurre?**  
-`________________________________________`
-
-**Evidencia de ejecución:**
-
-```text
-PEGAR_AQUÍ_LA_EVIDENCIA
-```
-
----
-
-## Race Condition #3
-
-**Clase / método involucrado:**  
-`________________________________________`
-
-**Estado compartido involucrado:**  
-`________________________________________`
-
-**Comportamiento observado:**  
-`________________________________________`
-
-**¿Por qué ocurre?**  
-`________________________________________`
-
-**Evidencia de ejecución:**
-
-```text
-PEGAR_AQUÍ_LA_EVIDENCIA
-```
-
----
-
-# 4. Interleaving
-
-Seleccione una de las condiciones de carrera anteriores y represente un interleaving posible.
-
-**Condición seleccionada:**  
-`________________________________________`
-
-| Paso | Thread A | Thread B | Estado compartido |
-|---:|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-
-### Explicación
-
-¿Por qué este orden de ejecución produce un resultado incorrecto?
-
-**Respuesta:**
-
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-# 5. Invariantes del sistema
-
-Defina las invariantes que su solución debe preservar.
-
-## I1
-
-`________________________________________________________________________`
-
-## I2
-
-`________________________________________________________________________`
-
-## I3
-
-`________________________________________________________________________`
-
-## I4 — opcional
-
-`________________________________________________________________________`
-
----
-
-# 6. Regiones críticas
-
-Documente cada región crítica identificada.
-
-| Clase | Región crítica | Invariante protegida | Mecanismo usado | ¿Por qué ese tamaño? |
-|---|---|---|---|---|
-| | | | | |
-| | | | | |
-| | | | | |
-
----
-
-# 7. Decisiones de sincronización
-
-## 7.1 Alternativas consideradas
-
-Marque y explique cuáles evaluaron:
-
-- [ ] `synchronized`
-- [ ] `AtomicInteger`
-- [ ] Colecciones concurrentes
-- [ ] `Lock`
-- [ ] `wait()` / `notifyAll()`
-- [ ] Otra: `________________________`
-
-### Alternativa 1
-
-**Descripción:**  
-`________________________________________________________________________`
-
-**Ventaja:**  
-`________________________________________________________________________`
-
-**Desventaja:**  
-`________________________________________________________________________`
-
-### Alternativa 2
-
-**Descripción:**  
-`________________________________________________________________________`
-
-**Ventaja:**  
-`________________________________________________________________________`
-
-**Desventaja:**  
-`________________________________________________________________________`
-
-### Decisión final
-
-**Mecanismo seleccionado:**  
-`________________________________________`
-
-**Justificación:**  
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-# 8. Finalización de threads
-
-Explique cómo garantizaron que el programa solamente genera el reporte final cuando todos los robots han terminado.
-
-**Mecanismo utilizado:**  
-`________________________________________`
-
-**Explicación:**  
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
-### Pregunta
-
-¿Por qué usar `Thread.sleep(...)` no sería una solución correcta para esperar la finalización de todos los workers?
-
-**Respuesta:**  
-`________________________________________________________________________`
-
----
-
-# 9. PAUSE / RESUME
-
-## 9.1 Problema inicial
-
-Explique por qué el busy waiting de la implementación inicial no es adecuado.
-
-**Respuesta:**  
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-## 9.2 Solución implementada
-
-Explique cómo implementaron:
-
-- `pause()`
-- espera de los workers
-- `resume()`
-- despertar coordinado de los workers
-
-**Respuesta:**  
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-## 9.3 Snapshot consistente
-
-Cuando la simulación está pausada, registre:
-
-```text
-Processed parcels:
-Pending parcels:
-Registry size:
-Current leader:
-```
-
-Explique cómo garantizan que esos valores representan un estado consistente.
-
-**Respuesta:**  
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-# 10. Verificación con RaceConditionProbe
-
-Ejecute:
-
-```bash
-java -cp target/classes edu.eci.arsw.warehouse.verification.RaceConditionProbe 100 32 500
-```
-
-## Resultados
-
-| Robots | Paquetes | Runs | Anomalías antes | Anomalías después |
-|---:|---:|---:|---:|---:|
-| 8 | 100 | | | |
-| 16 | 250 | | | |
-| 32 | 500 | | | |
-
-### Resultado final esperado
-
-```text
-Anomalous runs: 0/100
-```
-
-**Salida obtenida:**
-
-```text
-PEGAR_AQUÍ_LA_SALIDA
-```
-
----
-
-# 11. Evidencia de correctitud
-
-Explique brevemente cómo demuestran que su solución es correcta.
-
-Considere:
-
-- invariantes;
-- múltiples ejecuciones;
-- distintas cargas;
-- ausencia de resultados duplicados;
-- ausencia de paquetes perdidos;
-- finalización correcta;
-- consistencia durante pausa.
-
-**Conclusión:**
-
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-# 12. Impacto en atributos de calidad
-
-| Atributo | Impacto de la solución | Evidencia / métrica |
-|---|---|---|
-| Correctitud / Reliability | | |
-| Performance / Throughput | | |
-| Maintainability | | |
-| Scalability | | |
-
----
-
-# 13. Trade-off principal
-
-¿Qué ganaron y qué sacrificaron al introducir sincronización?
-
-**Respuesta:**
-
-`________________________________________________________________________`
-
-`________________________________________________________________________`
-
----
-
-# 14. Análisis arquitectónico
-
-Suponga ahora que existen tres instancias de la aplicación:
-
-```text
-                 Load Balancer
-                       |
-            +----------+----------+
-            |          |          |
-          App A      App B      App C
-            \          |          /
-                    Database
-```
-
-## 14.1 Pregunta
-
-¿Los bloques `synchronized` utilizados dentro de una JVM garantizan consistencia entre `App A`, `App B` y `App C`?
+### 1.4 ¿Existe una condición de carrera?
 
 - [ ] Sí
 - [ ] No
 
 **Justificación:**
 
-`________________________________________________________________________`
-
-`________________________________________________________________________`
+> _(respuesta)_
 
 ---
 
-## 14.2 Evolución arquitectónica
+## Parte 2 - Construya el interleaving
 
-¿Qué alternativa consideraría para garantizar consistencia entre múltiples instancias?
+*Tiempo recomendado: 10 minutos*
 
-- [ ] Transacción en base de datos
-- [ ] Restricción / constraint en base de datos
-- [ ] Optimistic locking / versionado
-- [ ] Lock distribuido
-- [ ] Otra: `________________________`
+Complete una secuencia posible que haga que las dos reservas sean aceptadas aunque solo exista un cupo.
 
-**Decisión propuesta:**
+| Paso | Thread A | Thread B | availableSeats |
+|------|----------|----------|-----------------|
+| 1    |          |          | 1               |
+| 2    |          |          |                 |
+| 3    |          |          |                 |
+| 4    |          |          |                 |
+| 5    |          |          |                 |
+| 6    |          |          |                 |
 
-`________________________________________________________________________`
+**Pregunta:** ¿Por qué una prueba que ejecuta el método una sola vez de forma secuencial no detecta este problema?
+
+> _(respuesta)_
+
+---
+
+## Parte 3 - Delimite la región crítica
+
+*Tiempo recomendado: 10 minutos*
+
+Considere estas tres alternativas.
+
+### Alternativa A - Sincronizar todo el método
+
+```java
+public synchronized boolean reserve(int requestedSeats) {
+    if (availableSeats >= requestedSeats) {
+        availableSeats -= requestedSeats;
+        return true;
+    }
+    return false;
+}
+```
+
+### Alternativa B - Sincronizar solo la escritura
+
+```java
+public boolean reserve(int requestedSeats) {
+    if (availableSeats >= requestedSeats) {
+        synchronized (this) {
+            availableSeats -= requestedSeats;
+        }
+        return true;
+    }
+    return false;
+}
+```
+
+### Alternativa C - Proteger validación + modificación con un lock privado
+
+```java
+private final Object inventoryLock = new Object();
+
+public boolean reserve(int requestedSeats) {
+    synchronized (inventoryLock) {
+        if (availableSeats >= requestedSeats) {
+            availableSeats -= requestedSeats;
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+### 3.1 Región crítica mínima
+
+¿Qué instrucciones deben permanecer dentro de la misma región crítica para preservar la invariante?
+
+> _(respuesta)_
+
+### 3.2 Evalúe las alternativas
+
+| Alternativa | ¿Preserva la invariante? | ¿Qué protege? | Riesgo o costo |
+|-------------|---------------------------|----------------|-----------------|
+| A           |                           |                |                 |
+| B           |                           |                |                 |
+| C           |                           |                |                 |
+
+### 3.3 Selección
+
+¿Cuál elegiría para una única instancia de la aplicación dentro de una JVM y por qué?
+
+**Decisión:**
+
+> _(respuesta)_
 
 **Justificación:**
 
-`________________________________________________________________________`
+> _(respuesta)_
 
 ---
 
-# 15. Mini ADR
+## Parte 4 - El problema se vuelve arquitectónico
 
-## ADR-001 — Concurrency control for warehouse shared state
+*Tiempo recomendado: 15 minutos*
 
-### Context
+El sistema crece. Ahora existen tres instancias del servicio detrás de un balanceador:
 
-`________________________________________________________________________`
+```
+                Request
+                   |
+             Load Balancer
+             /     |      \
+         App A   App B   App C
+             \     |      /
+          Base de datos compartida
+```
 
-`________________________________________________________________________`
+Cada instancia tiene su propio proceso y su propia memoria.
 
-### Decision
+### 4.1 Pregunta crítica
 
-`________________________________________________________________________`
+¿Un `synchronized` en App A evita que App B reserve el mismo último cupo al mismo tiempo?
 
-`________________________________________________________________________`
+- [ ] Sí
+- [ ] No
 
-### Alternatives considered
+**Explique:**
 
-1. `____________________________________________________________________`
-2. `____________________________________________________________________`
+> _(respuesta)_
 
-### Quality attributes affected
+### 4.2 ¿Dónde debe vivir ahora la garantía de consistencia?
 
-`________________________________________________________________________`
+Seleccione una o más alternativas razonables y justifique:
 
-### Evidence
+- [ ] Monitor `synchronized` en cada JVM.
+- [ ] `AtomicInteger` en cada instancia.
+- [ ] Transacción en base de datos.
+- [ ] Restricción/constraint de base de datos.
+- [ ] Control optimista de concurrencia/versionado.
+- [ ] Lock distribuido.
+- [ ] Otra: _______________________________
 
-`________________________________________________________________________`
+**Decisión:**
 
-### Consequences
+> _(respuesta)_
 
-`________________________________________________________________________`
+### 4.3 Atributos de calidad
 
-### Risks
-
-`________________________________________________________________________`
-
----
-
-# 16. Cambios realizados
-
-Resuma los principales cambios de código.
-
-| Archivo / Clase | Cambio realizado | Razón |
-|---|---|---|
-| | | |
-| | | |
-| | | |
-| | | |
-
----
-
-# 17. Pruebas ejecutadas
-
-| Prueba | Comando | Resultado |
-|---|---|---|
-| Compilación y tests | `mvn clean test` | |
-| Simulación estándar | | |
-| RaceConditionProbe | | |
-| Pause / Resume | | |
-| Otra | | |
+| Atributo                    | Impacto esperado | ¿Cómo lo mediría? |
+|------------------------------|-------------------|---------------------|
+| Correctitud / consistencia   |                   |                     |
+| Rendimiento / latencia       |                   |                     |
+| Escalabilidad                |                   |                     |
+| Disponibilidad                |                   |                     |
+| Mantenibilidad                |                   |                     |
 
 ---
 
-# 18. Conclusiones
+## Parte 5 - Mini decisión arquitectónica
 
-Incluya entre **3 y 5 conclusiones concretas**.
+*Tiempo recomendado: 10 minutos*
 
-1. `______________________________________________________________________`
-2. `______________________________________________________________________`
-3. `______________________________________________________________________`
-4. `______________________________________________________________________`
-5. `______________________________________________________________________`
+Redacte una decisión de máximo 8 líneas.
 
----
+### Contexto
 
-# 19. Checklist de entrega
+> _(respuesta)_
 
-- [ ] El proyecto compila con `mvn clean test`.
-- [ ] El código utiliza Java 21.
-- [ ] No se eliminó la concurrencia.
-- [ ] No existe busy waiting en la solución final.
-- [ ] El programa espera correctamente la finalización de todos los robots.
-- [ ] Las regiones críticas están justificadas.
-- [ ] Se preservan las invariantes definidas.
-- [ ] El `RaceConditionProbe` final no presenta anomalías.
-- [ ] Se documentó el análisis arquitectónico.
-- [ ] Se incluyó el ADR.
-- [ ] El repositorio contiene commits claros.
-- [ ] Se incluyó la URL del repositorio y el commit final.
+### Decisión
+
+> _(respuesta)_
+
+### Trade-off principal
+
+> _(respuesta)_
+
+### Evidencia que pediría antes de aprobar la decisión
+
+Mencione por lo menos dos métricas o pruebas.
+
+1. _(respuesta)_
+2. _(respuesta)_
 
 ---
 
-## Nota
+## Criterios de evaluación
 
-No se evalúa la cantidad de texto. Se evalúa la capacidad de demostrar:
+| Criterio                                                          | Peso |
+|---------------------------------------------------------------------|------|
+| Identificación correcta de estado, carrera e invariante             | 25%  |
+| Interleaving técnicamente válido                                    | 20%  |
+| Delimitación correcta de la región crítica                          | 20%  |
+| Razonamiento al pasar de una JVM a varias instancias                | 20%  |
+| Relación entre decisión, atributos de calidad y evidencia           | 15%  |
+| **TOTAL**                                                            | **100%** |
 
-> **problema → evidencia → invariante → región crítica → decisión → implementación → verificación → trade-off arquitectónico**
+---
+
+## Entrega
+
+El `README.md` debe incluir:
+
+- [ ] Respuestas completas.
+- [ ] Interleaving diligenciado.
+- [ ] Tabla de alternativas.
+- [ ] Decisión para una JVM.
+- [ ] Decisión para múltiples instancias.
+- [ ] Atributos de calidad y métricas.
+- [ ] Mini decisión arquitectónica final.
+
+> **Criterio de calidad:** No se califica por cantidad de texto. Se califica la precisión del razonamiento.
