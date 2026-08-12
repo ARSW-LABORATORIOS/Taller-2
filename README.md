@@ -79,9 +79,9 @@ Suponga que inicialmente existe 1 cupo y llegan al mismo tiempo dos solicitudes:
 
 La expresión de reserva parece una sola operación de negocio, pero realmente contiene varias acciones. Descompóngala en pasos lógicos.
 
-1. _(paso 1)_
-2. _(paso 2)_
-3. _(paso 3)_
+1. Ver y leer el valor actual de `availableSeats` y hacer la comparación con `requestedSeats`
+2. Puede que hayan cupos disponibles, por lo que calcula el nuevo valor restando `requestedSeats` a `availableSeats`
+3. Se escribe el nuevo valor en `availableSeats` y retorna `true`
 
 ### 1.3 Invariante
 
