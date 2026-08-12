@@ -87,7 +87,7 @@ La expresión de reserva parece una sola operación de negocio, pero realmente c
 
 Defina la invariante principal que debe mantenerse.
 
-> _(respuesta)_
+> Hay que definir la condición que el sistema debe cumplir, con ello el valor de `availableSeats` no puede ser negativo y a su vez no puede ser reservado dos veces, es decir, la suma total de cupos reservados nunca puede superar el número inicial de cupos disponibles.
 
 ### 1.4 ¿Existe una condición de carrera?
 
