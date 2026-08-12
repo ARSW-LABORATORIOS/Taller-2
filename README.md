@@ -108,16 +108,16 @@ Complete una secuencia posible que haga que las dos reservas sean aceptadas aunq
 
 | Paso | Thread A | Thread B | availableSeats |
 |------|----------|----------|-----------------|
-| 1    |          |          | 1               |
-| 2    |          |          |                 |
-| 3    |          |          |                 |
-| 4    |          |          |                 |
-| 5    |          |          |                 |
-| 6    |          |          |                 |
+| 1    | --       | --       | 1               |
+| 2    | lee `availableSeats` obtiene 1 | -- | 1 |
+| 3    | --       | lee `availableSeats` obtiene 1 | 1 |
+| 4    | evalúa `1 >= 1` → true | -- | 1 |
+| 5    | escribe `availableSeats = 1 - 1 = 0`, retorna `true` | -- | 0 |
+| 6    | --       | evalúa `1 >= 1` → true con el valor que leyó en el paso 3, antes de que el hilo A escribiera, escribe `availableSeats = 1 - 1 = 0` y retorna `true` | 0 |
 
 **Pregunta:** ¿Por qué una prueba que ejecuta el método una sola vez de forma secuencial no detecta este problema?
 
-> _(respuesta)_
+> La prueba en forma secuencial no genera concurrencia real, cada vez que se llama a `reserve` se ejecutan todos los pasos (lectura, validación y escritura) antes de que inicie el siguiente. El problema radica en que solo aparece cuando dos hilos se intercalan en esos pasos y ambos leen el estado antes de que el otro escriba su resultado. Sin embargo, una ejecución de un solo hilo, así se haga una sola vez, nunca puede reproducir ese entrelazado.
 
 ---
 
