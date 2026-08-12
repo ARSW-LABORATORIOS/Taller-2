@@ -91,12 +91,12 @@ Defina la invariante principal que debe mantenerse.
 
 ### 1.4 ¿Existe una condición de carrera?
 
-- [ ] Sí
+- [x] Sí
 - [ ] No
 
 **Justificación:**
 
-> _(respuesta)_
+> La operación `reserve` no es atómica, por lo que internamente hace una lectura de `availableSeats`, una comparación y después una escritura, como tres pasos separados. Si dos hilos entran casi al mismo tiempo, ambos pueden leer el mismo valor de `availableSeats` antes de que ninguno haya escrito el resultado. Como los dos ven que hay cupo disponible, ambos pasan la validación y ambos terminan restando y devuelven `true`, haciendo que se reserve el mismo cupo dos veces aunque solo haya uno disponible.
 
 ---
 
