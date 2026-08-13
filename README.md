@@ -309,12 +309,12 @@ de que la transaccion no afecte mucho el rendimiento
 
 El `README.md` debe incluir:
 
-- [ ] Respuestas completas.
-- [ ] Interleaving diligenciado.
-- [ ] Tabla de alternativas.
-- [ ] Decisión para una JVM.
-- [ ] Decisión para múltiples instancias.
-- [ ] Atributos de calidad y métricas.
-- [ ] Mini decisión arquitectónica final.
+- [x] Respuestas completas.
+- [x] Interleaving diligenciado.
+- [x] Tabla de alternativas.
+- [x] Decisión para una JVM.
+- [x] Decisión para múltiples instancias.
+- [x] Atributos de calidad y métricas.
+- [x] Mini decisión arquitectónica final.
 
 > **Criterio de calidad:** No se califica por cantidad de texto. Se califica la precisión del razonamiento.
