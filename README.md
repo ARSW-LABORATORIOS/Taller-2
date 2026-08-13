@@ -260,22 +260,35 @@ Redacte una decisión de máximo 8 líneas.
 
 ### Contexto
 
-> _(respuesta)_
+como el servicio de reservas se ejecuta en varias instancias que
+comparten una misma base de datos los mecanismos de sincronizacion
+local de cada JVM ya no son suficientes para evitar reservas sobre
+el mismo cupo
 
 ### Decisión
 
-> _(respuesta)_
+la decision sera garantizar que las reservas se mantengan consistentes
+desde la base de datos, por lo que se utilizara una transaccion que 
+agrupe la validacion y actualizacion de los cupos, incluyendo una 
+restriccion que impida estados invalidos (CHECK (available_seats >= 0))
 
 ### Trade-off principal
 
-> _(respuesta)_
+aunque conseguiremos una mayor correctitud y consistencia entre todas
+las instacias, obtendremos un aumento en la dependicia de la base de 
+datos y tambien puede que aumente la latencia 
 
 ### Evidencia que pediría antes de aprobar la decisión
 
 Mencione por lo menos dos métricas o pruebas.
 
-1. _(respuesta)_
-2. _(respuesta)_
+1. se hara una prueba de concurrecia la cual tenga varias instancias
+para intentar reservar simultaneamente el ultimo cupo, para que asi
+solo una reserva sea aceptada y que availableSeats nunca sea negativo
+
+2. se hara una prueba de rendimiendo donde se medira la latencia p95, p99 
+y el throughput en diferentes niveles de concurrencia, esto con el fin
+de que la transaccion no afecte mucho el rendimiento
 
 ---
 
